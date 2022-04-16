@@ -5,13 +5,13 @@ Created on Sat Apr 16 16:02:19 2022
 @author: Johnny
 """
 
-file = open("messages.txt", "r");    
-output = open("output.txt", "w");
+file = open("messages.txt", "r");    //INPUT FILE
+output = open("output.txt", "w");    //OUTPUT FILE
 
 lines = file.readlines();
 res = ["name,line\n"];
 
-USER = "'\\u1cbc\\u1cbc'";
+USER = "'\\u1cbc\\u1cbc'"; //DISCORD USERNAME
 USERNAME = "'username': " + USER; 
 
 for i in lines:
