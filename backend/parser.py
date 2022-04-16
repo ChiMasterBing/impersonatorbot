@@ -5,18 +5,28 @@ Created on Sat Apr 16 16:02:19 2022
 @author: Johnny
 """
 
-file = open("test.txt", "r");    #INPUT FILE
-output = open("output.txt", "w");    #OUTPUT FILE
+file = open("messages.txt", "r");    
+output = open("output.txt", "w");
 
 lines = file.readlines();
 res = ["name,line\n"];
 
-USER = "'\\u1cbc\\u1cbc'"; #DISCORD USERNAME
+USER = "'\\u1cbc\\u1cbc'";
 USERNAME = "'username': " + USER; 
-
+cons = True;
+runningMsg = "";
+other = [];
 for i in lines:
     #print(i.find("'username': '\\u1cbc\\u1cbc'"));
     if i.find(USERNAME) != -1:
+        if cons == False:
+            cons = True;
+            adds = "";
+            for j in range(0, min(7, len(other))):   
+                adds += " \\n " + other[len(other)-min(7, len(other))-1+j];             
+            adds = adds[4:len(adds)];
+            res.append("anonymous" + ",\"" + adds + "\"" + "\n");
+            other = [];
         left = i.index("content") + 11;
         right = i.index("channel_id") - 4;
         msg = "";
@@ -26,8 +36,15 @@ for i in lines:
             msg += i[j];
         msg.strip();
         if (len(msg) > 0):
-            res.append(USER + "," + msg + "\n") ;
+            runningMsg += (" \\n " + msg);
+            
     elif i.find("'username'") != -1:
+        if cons == True:
+            runningMsg = runningMsg[4:len(runningMsg)];
+            res.append(USER + "," + "\"" + runningMsg +  "\"" + "\n");
+            cons = False;
+            runningMsg = "";
+        
         left = i.index("content") + 11;
         right = i.index("channel_id") - 4;
         msg = "";
@@ -37,7 +54,8 @@ for i in lines:
             msg += i[j];
         msg.strip();
         if (len(msg) > 0):
-            res.append("anonymous" + "," + msg + "\n");
+            other.append(msg);
+            
 output.writelines(res);
 output.write("");
 print("parsed");
