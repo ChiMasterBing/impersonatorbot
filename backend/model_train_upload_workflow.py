@@ -70,18 +70,22 @@ CHARACTER_NAME = 'daniel'
 
 contexted = []
 
+def format(data, index):
+  data.line[index] = re.sub("<.*>", "", data.line[index]).strip()
+  data.line[index] = re.sub(r'[^\w\s]', '', data.line[index])
+  return data.line[index]
+
 # context window of size 7
 n = 7
 
 for i in data[data.name == CHARACTER_NAME].index:
   if i < n or data.line[i] == None or str(data.line[i]).strip() == "":
     continue
-  data.line[i] = res = re.sub(r'[^\w\s]', '', data.line[i])
+  
   row = []
   prev = i - 1 - n # we additionally substract 1, so row will contain current responce and 7 previous responces  
   for j in range(i, prev, -1):
-    data.line[j] = res = re.sub(r'[^\w\s]', '', data.line[j])
-    row.append(data.line[j])
+    row.append(format(data, j))
   contexted.append(row)
 
 columns = ['response', 'context'] 
@@ -609,32 +613,46 @@ main(trn_df, val_df)
 
 """## Load the Trained Model"""
 
-tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-small')
+tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-medium')
 model = AutoModelWithLMHead.from_pretrained('output-small')
 
 # Let's chat for 4 lines
-for x in range(4):
-  for step in range(4):
-      # encode the new user input, add the eos_token and return a tensor in Pytorch
-      new_user_input_ids = tokenizer.encode(input(">> User:") + tokenizer.eos_token, return_tensors='pt')
-      # print(new_user_input_ids)
+context = []
+for step in range(12):
+    # encode the new user input, add the eos_token and return a tensor in Pytorch
+    new_user_input_ids = tokenizer.encode(input(">> User:") + tokenizer.eos_token, return_tensors='pt')
+   # print(new_user_input_ids)
+    #print(new_user_input_ids.shape)
 
-      # append the new user input tokens to the chat history
-      bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
+    # append the new user input tokens to the chat history
+    bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
+    #print(bot_input_ids)
+    #print(bot_input_ids.shape)
 
-      # generated a response while limiting the total chat history to 1000 tokens, 
-      chat_history_ids = model.generate(
-          bot_input_ids, max_length=200,
-          pad_token_id=tokenizer.eos_token_id,  
-          no_repeat_ngram_size=3,       
-          do_sample=True, 
-          top_k=100, 
-          top_p=0.7,
-          temperature=0.8
-      )
-      
-      # pretty print last ouput tokens from bot
-      print("Daniel: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+    if (len(context) == 3):
+      bot_input_ids = torch.split(bot_input_ids, [context[0], len(bot_input_ids[0]) - context[0]],dim=-1)[1]
+      # Second option
+      #bot_input_ids = torch.split(bot_input_ids, [len(bot_input_ids[0]) - context[0], context[0]],dim=-1)[0]
+     # print(bot_input_ids)
+      #print(bot_input_ids.shape)
+      del context[0]
+    # generated a response while limiting the total chat history to 1000 tokens, 
+    chat_history_ids = model.generate(
+        bot_input_ids, max_length=1000,
+        pad_token_id=tokenizer.eos_token_id,  
+        no_repeat_ngram_size=7,       
+        do_sample=True, 
+        #modify hyperparameters
+        top_k=100, 
+        top_p=0.6,
+        temperature=1.5
+    )
+    #print(chat_history_ids)
+    #print(chat_history_ids.shape)
+    context.append(len(chat_history_ids[0]) - (sum(context) if context != [] else 0))
+    #print(context)
+    # pretty print last ouput tokens from bot
+    print(CHARACTER_NAME + "Bot: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
 
 """## Push Model to Hugging Face"""
 '''
