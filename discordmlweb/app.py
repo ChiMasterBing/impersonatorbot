@@ -60,7 +60,6 @@ def result():
         print(cur);
         f.flush();
         import parser
-        print(user);
     else:
         print("JMJ")
     return render_template('index.html')

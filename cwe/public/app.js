@@ -23,15 +23,15 @@ function send(){
         document.getElementById("p1").innerHTML = temp;
 }
 
-var yes = false;
 document.getElementById('pp').addEventListener('submit', (token) => {
-        yes = true;
-        if(yes){
+        
+        if(document.getElementById("p1").innerHTML == "Discord thing"){
                 token.preventDefault();
                 var tok = document.getElementById('pp').elements[0].value;
                 console.log(tok);
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", 'http://127.0.0.1:5000/result', true);
+                //note change this
+                xhr.open("POST", 'http://127.0.0.1:5000/result', true); 
                 console.log("HERE");
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -53,6 +53,6 @@ document.getElementById('pp').addEventListener('submit', (token) => {
                     // use `url` here inside the callback because it's asynchronous!
                 });
         }else{
-                sendget();
+                send();
         }
 });
