@@ -1,3 +1,3 @@
-document.getElementById('authorize-btn').addEventListener('click', () => {
+document.getElementById('btn').addEventListener('click', () => {
     console.log("Authorizing...");
 });

@@ -59,12 +59,3 @@ for i in lines:
 output.writelines(res);
 output.write("");
 print("parsed");
-
-        
-
-    
-        
-        
-        
-    
-
