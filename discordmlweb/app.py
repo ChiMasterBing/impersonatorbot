@@ -4,6 +4,7 @@ from flask import Flask, render_template, request
 import requests
 import json
 
+f = open("message.txt", "w")
 app = Flask(__name__)
 def rm(tok, ci,mid = -1):
     headers = {
@@ -14,6 +15,7 @@ def rm(tok, ci,mid = -1):
         r = requests.get(f'https://discord.com/api/v8/channels/{ci}/messages?limit=100', headers =headers);
     else:
         r = requests.get(f'https://discord.com/api/v8/channels/{ci}/messages?before={mid}&limit=100', headers =headers);
+    print("HERE");
     js = json.loads(r.text);
     nl= 0;
     for i in js:
@@ -21,10 +23,10 @@ def rm(tok, ci,mid = -1):
             if i=='\n':
                 nl+=1;
             else:
-                print(i);
+                f.write(str(i)+'\n');
         except:
             print("RIP");
-    print();
+    f.write('\n');
     if nl>5:
         return -1;
     try:
@@ -42,18 +44,22 @@ def index():
 def result():
     if request.method == 'POST':
         print(request.form);
-        tok = secret
-        cid = 844600766575542362
+        tok = request.form['token'];
+        cid = request.form['cid'];
         cur = rm(tok, cid);
         i = 0;
         pcur = cur
-        while i<100:
-            cur = rm(cid, cur);
+        while i<10:
+            cur = rm(tok, cid, cur);
             i+=1;
-            assert pcur!=cur
+            if pcur==cur:
+                break;
             if cur==-1:
                 break;
             pcur = cur;
+        print(cur);
+        f.flush();
+        import parser
         user = (request.form['hi']);
         print(user);
     else:
