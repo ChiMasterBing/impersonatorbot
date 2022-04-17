@@ -3,7 +3,7 @@ import json
 
 def rm(ci,mid = -1):
     headers = {
-            'authorization' : 'NjM5MjMzNDIyMzc5NzEyNTEy.YlrjjQ.jlSJst4BmeqnpHmpQu93JPRJ7vM'
+            'authorization' : 'secret'
     }
     r = '';
     if mid==-1:
