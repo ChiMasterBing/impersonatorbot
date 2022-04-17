@@ -613,7 +613,7 @@ main(trn_df, val_df)
 
 """## Load the Trained Model"""
 
-tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-medium')
+tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-small')
 model = AutoModelWithLMHead.from_pretrained('output-small')
 
 # Let's chat for 4 lines
