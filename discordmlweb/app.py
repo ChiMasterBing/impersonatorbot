@@ -60,7 +60,6 @@ def result():
         print(cur);
         f.flush();
         import parser
-        user = (request.form['hi']);
         print(user);
     else:
         print("JMJ")
